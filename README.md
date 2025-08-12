@@ -121,7 +121,7 @@ Here are some sample `gcloud` commands you might find useful:
           "args": [
             "run",
             "--spec",
-            "git+https://github.com/googleanalytics/google-analytics-mcp.git",
+            "git+https://github.com/locomotive-agency/google-analytics-mcp.git",
             "google-analytics-mcp"
           ]
         }
@@ -143,7 +143,7 @@ Here are some sample `gcloud` commands you might find useful:
           "args": [
             "run",
             "--spec",
-            "git+https://github.com/googleanalytics/google-analytics-mcp.git",
+            "git+https://github.com/locomotive-agency/google-analytics-mcp.git",
             "google-analytics-mcp"
           ],
           "env": {
@@ -164,7 +164,7 @@ including the source in your image.
 - **Install from GitHub ZIP (no git):**
 
   ```bash
-  pip install --no-cache-dir https://github.com/googleanalytics/google-analytics-mcp/archive/refs/heads/main.zip
+  pip install --no-cache-dir https://github.com/locomotive-agency/google-analytics-mcp/archive/refs/heads/main.zip
   ```
 
 - **Install from local source (COPY into image):**
@@ -192,7 +192,7 @@ FROM python:3.12-slim
 
 # Install the server without git using the GitHub source ZIP
 RUN pip install --no-cache-dir \
-    https://github.com/googleanalytics/google-analytics-mcp/archive/refs/heads/main.zip
+    https://github.com/locomotive-agency/google-analytics-mcp/archive/refs/heads/main.zip
 
 # Provide credentials at runtime (recommended: mount a secret)
 ENV GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/adc.json
