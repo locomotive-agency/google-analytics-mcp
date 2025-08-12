@@ -139,8 +139,21 @@ Credentials saved to file: [PATH_TO_CREDENTIALS_JSON]
 1.  Create or edit the file at `~/.gemini/settings.json`, adding your server
     to the `mcpServers` list.
 
-    Replace `PATH_TO_CREDENTIALS_JSON` with the path you copied in the previous
-    step.
+    ```json
+    {
+      "mcpServers": {
+        "analytics-mcp": {
+          "command": "pipx",
+          "args": [
+            "run",
+            "--spec",
+            "git+https://github.com/locomotive-agency/google-analytics-mcp.git",
+            "google-analytics-mcp"
+          ]
+        }
+      }
+    }
+    ```
 
 1.  **Optional:** Configure environment variables in Gemini settings. You may
     want to do this if you always want to use a specific set of credentials or
@@ -155,7 +168,9 @@ Credentials saved to file: [PATH_TO_CREDENTIALS_JSON]
           "command": "pipx",
           "args": [
             "run",
-            "analytics-mcp"
+            "--spec",
+            "git+https://github.com/locomotive-agency/google-analytics-mcp.git",
+            "google-analytics-mcp"
           ],
           "env": {
             "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_CREDENTIALS_JSON",
@@ -176,7 +191,7 @@ including the source in your image.
 - **Install from GitHub ZIP (no git):**
 
   ```bash
-  pip install --no-cache-dir https://github.com/googleanalytics/google-analytics-mcp/archive/refs/heads/main.zip
+  pip install --no-cache-dir https://github.com/locomotive-agency/google-analytics-mcp/archive/refs/heads/main.zip
   ```
 
 - **Install from local source (COPY into image):**
@@ -204,7 +219,7 @@ FROM python:3.12-slim
 
 # Install the server without git using the GitHub source ZIP
 RUN pip install --no-cache-dir \
-    https://github.com/googleanalytics/google-analytics-mcp/archive/refs/heads/main.zip
+    https://github.com/locomotive-agency/google-analytics-mcp/archive/refs/heads/main.zip
 
 # Provide credentials at runtime (recommended: mount a secret)
 ENV GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/adc.json
