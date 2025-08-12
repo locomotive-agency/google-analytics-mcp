@@ -59,6 +59,21 @@ Configure your [Application Default Credentials
 Make sure the credentials are for a user with access to your Google Analytics
 accounts or properties.
 
+- **Service account JSON via `GOOGLE_APPLICATION_CREDENTIALS`**: ADC supports
+  pointing to a service account key file. Set `GOOGLE_APPLICATION_CREDENTIALS`
+  to the absolute path of your service account JSON and the server will use it
+  automatically.
+
+- **Delegated subject (domain-wide delegation)**: If your service account needs
+  to act on behalf of a user so that
+  Analytics properties are visible, set the environment variable
+  `ANALYTICS_MCP_SUBJECT` to that user’s email. The server will apply
+  domain‑wide delegation when using service account credentials. Ensure the
+  service account is configured for
+  [delegating domain‑wide authority](https://developers.google.com/identity/protocols/oauth2/service-account#delegatingauthority)
+  and has access to the relevant Analytics data. For backward compatibility,
+  the alias `GOOGLE_IMPERSONATED_SUBJECT` is also supported.
+
 Credentials must include the Google Analytics read-only scope:
 
 ```
@@ -114,15 +129,11 @@ Here are some sample `gcloud` commands you might find useful:
     }
     ```
 
-1.  **Optional:** Configure the `GOOGLE_APPLICATION_CREDENTIALS` environment
-    variable in Gemini settings. You may want to do this if you always want to
-    use a specific set of credentials, regardless of which Application Default
-    Credentials are selected in your current environment.
+1.  **Optional:** Configure environment variables in Gemini settings. You may
+    want to do this if you always want to use a specific set of credentials or
+    delegated subject, regardless of your local ADC.
 
-    In `~/.gemini/settings.json`, add a `GOOGLE_APPLICATION_CREDENTIALS`
-    attribute to the `env` object. Replace `PATH_TO_ADC_JSON` in the following
-    example with the full path to the ADC JSON file you always want to use for
-    your MCP server.
+    In `~/.gemini/settings.json`, add these to the `env` object as needed.
 
     ```json
     {
@@ -136,12 +147,60 @@ Here are some sample `gcloud` commands you might find useful:
             "google-analytics-mcp"
           ],
           "env": {
-            "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_ADC_JSON"
+            "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_ADC_JSON",
+            "ANALYTICS_MCP_SUBJECT": "client@locomotive.agency"
           }
         }
       }
     }
     ```
+
+## Running on python:slim containers (no git)
+
+If your runtime is a slim Python container without `git`, you can install and
+run the server using either the GitHub source ZIP (no git required) or by
+including the source in your image.
+
+- **Install from GitHub ZIP (no git):**
+
+  ```bash
+  pip install --no-cache-dir https://github.com/googleanalytics/google-analytics-mcp/archive/refs/heads/main.zip
+  ```
+
+- **Install from local source (COPY into image):**
+
+  ```bash
+  pip install --no-cache-dir .
+  ```
+
+- **Run command:**
+
+  ```bash
+  google-analytics-mcp
+  ```
+
+- **Required environment variables:**
+  - `GOOGLE_APPLICATION_CREDENTIALS`: Absolute path to your service account
+    JSON (mount or secret). Example: `/var/secrets/adc.json`.
+  - `ANALYTICS_MCP_SUBJECT` (optional): Delegated user email to impersonate,
+    e.g. `client@locomotive.agency`.
+
+Example Dockerfile snippet:
+
+```dockerfile
+FROM python:3.12-slim
+
+# Install the server without git using the GitHub source ZIP
+RUN pip install --no-cache-dir \
+    https://github.com/googleanalytics/google-analytics-mcp/archive/refs/heads/main.zip
+
+# Provide credentials at runtime (recommended: mount a secret)
+ENV GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/adc.json
+# Optional: impersonate a delegated subject
+# ENV ANALYTICS_MCP_SUBJECT=client@locomotive.agency
+
+CMD ["google-analytics-mcp"]
+```
 
 ## Try it out :lab_coat:
 
