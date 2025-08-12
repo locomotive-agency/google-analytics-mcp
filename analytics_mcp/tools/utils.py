@@ -15,11 +15,14 @@
 """Common utilities used by the MCP server."""
 
 from typing import Any, Dict
+import os
 
 from google.analytics import admin_v1beta, data_v1beta
 from google.api_core.gapic_v1.client_info import ClientInfo
 from importlib import metadata
 import google.auth
+import google.auth.credentials
+from google.oauth2.service_account import Credentials as ServiceAccountCredentials
 import proto
 
 
@@ -46,8 +49,27 @@ _READ_ONLY_ANALYTICS_SCOPE = (
 
 
 def _create_credentials() -> google.auth.credentials.Credentials:
-    """Returns Application Default Credentials with read-only scope."""
+    """Returns ADC credentials with read-only scope and optional subject.
+
+    Behavior:
+    - Loads Application Default Credentials (ADC). If the environment variable
+      `GOOGLE_APPLICATION_CREDENTIALS` points to a service account JSON, ADC
+      will use it automatically.
+    - If the environment variable `ANALYTICS_MCP_SUBJECT` (or legacy alias
+      `GOOGLE_IMPERSONATED_SUBJECT`) is set, and the loaded credentials are a
+      service account, domain-wide delegation will be applied via
+      `with_subject(subject)` so the service account can impersonate the given
+      user (e.g., `client@locomotive.agency`).
+    """
     (credentials, _) = google.auth.default(scopes=[_READ_ONLY_ANALYTICS_SCOPE])
+
+    # Support delegated user subject for service account credentials.
+    subject = os.environ.get("ANALYTICS_MCP_SUBJECT") or os.environ.get(
+        "GOOGLE_IMPERSONATED_SUBJECT"
+    )
+    if subject and isinstance(credentials, ServiceAccountCredentials):
+        credentials = credentials.with_subject(subject)
+
     return credentials
 
 

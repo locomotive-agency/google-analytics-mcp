@@ -77,6 +77,21 @@ Configure your [Application Default Credentials
 Make sure the credentials are for a user with access to your Google Analytics
 accounts or properties.
 
+- **Service account JSON via `GOOGLE_APPLICATION_CREDENTIALS`**: ADC supports
+  pointing to a service account key file. Set `GOOGLE_APPLICATION_CREDENTIALS`
+  to the absolute path of your service account JSON and the server will use it
+  automatically.
+
+- **Delegated subject (domain-wide delegation)**: If your service account needs
+  to act on behalf of a user so that
+  Analytics properties are visible, set the environment variable
+  `ANALYTICS_MCP_SUBJECT` to that user’s email. The server will apply
+  domain‑wide delegation when using service account credentials. Ensure the
+  service account is configured for
+  [delegating domain‑wide authority](https://developers.google.com/identity/protocols/oauth2/service-account#delegatingauthority)
+  and has access to the relevant Analytics data. For backward compatibility,
+  the alias `GOOGLE_IMPERSONATED_SUBJECT` is also supported.
+
 Credentials must include the Google Analytics read-only scope:
 
 ```
@@ -127,10 +142,11 @@ Credentials saved to file: [PATH_TO_CREDENTIALS_JSON]
     Replace `PATH_TO_CREDENTIALS_JSON` with the path you copied in the previous
     step.
 
-    We also recommend that you add a `GOOGLE_CLOUD_PROJECT` attribute to the
-    `env` object. Replace `YOUR_PROJECT_ID` in the following example with the
-    [project ID](https://support.google.com/googleapi/answer/7014113) of your
-    Google Cloud project.
+1.  **Optional:** Configure environment variables in Gemini settings. You may
+    want to do this if you always want to use a specific set of credentials or
+    delegated subject, regardless of your local ADC.
+
+    In `~/.gemini/settings.json`, add these to the `env` object as needed.
 
     ```json
     {
@@ -144,13 +160,61 @@ Credentials saved to file: [PATH_TO_CREDENTIALS_JSON]
           "env": {
             "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_CREDENTIALS_JSON",
             "GOOGLE_PROJECT_ID": "YOUR_PROJECT_ID"
+            "ANALYTICS_MCP_SUBJECT": "client@locomotive.agency"
           }
         }
       }
     }
     ```
 
-## Try it out 🥼
+## Running on python:slim containers (no git)
+
+If your runtime is a slim Python container without `git`, you can install and
+run the server using either the GitHub source ZIP (no git required) or by
+including the source in your image.
+
+- **Install from GitHub ZIP (no git):**
+
+  ```bash
+  pip install --no-cache-dir https://github.com/googleanalytics/google-analytics-mcp/archive/refs/heads/main.zip
+  ```
+
+- **Install from local source (COPY into image):**
+
+  ```bash
+  pip install --no-cache-dir .
+  ```
+
+- **Run command:**
+
+  ```bash
+  google-analytics-mcp
+  ```
+
+- **Required environment variables:**
+  - `GOOGLE_APPLICATION_CREDENTIALS`: Absolute path to your service account
+    JSON (mount or secret). Example: `/var/secrets/adc.json`.
+  - `ANALYTICS_MCP_SUBJECT` (optional): Delegated user email to impersonate,
+    e.g. `client@locomotive.agency`.
+
+Example Dockerfile snippet:
+
+```dockerfile
+FROM python:3.12-slim
+
+# Install the server without git using the GitHub source ZIP
+RUN pip install --no-cache-dir \
+    https://github.com/googleanalytics/google-analytics-mcp/archive/refs/heads/main.zip
+
+# Provide credentials at runtime (recommended: mount a secret)
+ENV GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/adc.json
+# Optional: impersonate a delegated subject
+# ENV ANALYTICS_MCP_SUBJECT=client@locomotive.agency
+
+CMD ["google-analytics-mcp"]
+```
+
+## Try it out :lab_coat:
 
 Launch Gemini Code Assist or Gemini CLI and type `/mcp`. You should see
 `analytics-mcp` listed in the results.
