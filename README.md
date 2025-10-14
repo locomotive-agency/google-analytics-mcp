@@ -1,271 +1,157 @@
-# Google Analytics MCP Server (Experimental)
+# Google Analytics MCP Server
 
-[![PyPI version](https://img.shields.io/pypi/v/analytics-mcp.svg)](https://pypi.org/project/analytics-mcp/)
+[![PyPI version](https://img.shields.io/pypi/v/google-analytics-mcp-python.svg)](https://pypi.org/project/google-analytics-mcp-python/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![GitHub branch check runs](https://img.shields.io/github/check-runs/googleanalytics/google-analytics-mcp/main)](https://github.com/googleanalytics/google-analytics-mcp/actions?query=branch%3Amain++)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/analytics-mcp)](https://pypi.org/project/analytics-mcp/)
-[![GitHub stars](https://img.shields.io/github/stars/googleanalytics/google-analytics-mcp?style=social)](https://github.com/googleanalytics/google-analytics-mcp/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/googleanalytics/google-analytics-mcp?style=social)](https://github.com/googleanalytics/google-analytics-mcp/network/members)
-[![YouTube Video Views](https://img.shields.io/youtube/views/PT4wGPxWiRQ)](https://www.youtube.com/watch?v=PT4wGPxWiRQ)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-This repo contains the source code for running a local
-[MCP](https://modelcontextprotocol.io) server that interacts with APIs for
-[Google Analytics](https://support.google.com/analytics).
+A Model Context Protocol (MCP) server for comprehensive Google Analytics API access. Built with FastMCP and maintained by [Locomotive Agency](https://locomotive.agency) for use with [mcpanywhere.com](https://mcpanywhere.com).
 
-Join the discussion and ask questions in the
-[🤖-analytics-mcp channel](https://discord.com/channels/971845904002871346/1398002598665257060)
-on Discord.
+This server provides access to the [Google Analytics Admin API](https://developers.google.com/analytics/devguides/config/admin/v1) and [Google Analytics Data API](https://developers.google.com/analytics/devguides/reporting/data/v1) through MCP tools for LLM integration.
 
-## Tools 🛠️
+## Features
 
-The server uses the
-[Google Analytics Admin API](https://developers.google.com/analytics/devguides/config/admin/v1)
-and
-[Google Analytics Data API](https://developers.google.com/analytics/devguides/reporting/data/v1)
-to provide several
-[Tools](https://modelcontextprotocol.io/docs/concepts/tools) for use with LLMs.
+The server provides the following MCP tools:
 
-### Retrieve account and property information 🟠
+### Account & Property Information
 
-- `get_account_summaries`: Retrieves information about the user's Google
-  Analytics accounts and properties.
-- `get_property_details`: Returns details about a property.
-- `list_google_ads_links`: Returns a list of links to Google Ads accounts for
-  a property.
+- `get_account_summaries` - Retrieves information about Google Analytics accounts and properties
+- `get_property_details` - Returns details about a specific property
+- `list_google_ads_links` - Lists Google Ads account links for a property
 
-### Run core reports 📙
+### Core Reports
 
-- `run_report`: Runs a Google Analytics report using the Data API.
-- `get_custom_dimensions_and_metrics`: Retrieves the custom dimensions and
-  metrics for a specific property.
+- `run_report` - Runs a Google Analytics report using the Data API
+- `get_custom_dimensions_and_metrics` - Retrieves custom dimensions and metrics for a property
 
-### Run realtime reports ⏳
+### Realtime Reports
 
-- `run_realtime_report`: Runs a Google Analytics realtime report using the
-  Data API.
+- `run_realtime_report` - Runs a Google Analytics realtime report using the Data API
 
-## Setup instructions 🔧
+## Installation
 
-✨ Watch the [Google Analytics MCP Setup
-Tutorial](https://youtu.be/nS8HLdwmVlY) on YouTube for a step-by-step
-walkthrough of these instructions.
+### Recommended (via uv)
 
-[![Watch the video](https://img.youtube.com/vi/nS8HLdwmVlY/mqdefault.jpg)](https://www.youtube.com/watch?v=nS8HLdwmVlY)
+```bash
+uv tool install google-analytics-mcp-python
+```
 
-Setup involves the following steps:
+### Alternative (via pip)
 
-1.  Configure Python.
-1.  Configure credentials for Google Analytics.
-1.  Configure Gemini.
+```bash
+pip install google-analytics-mcp-python
+```
 
-### Configure Python 🐍
+### Alternative (via pipx)
 
-[Install pipx](https://pipx.pypa.io/stable/#install-pipx).
+```bash
+pipx install google-analytics-mcp-python
+```
 
-### Enable APIs in your project ✅
+## Configuration
 
-[Follow the instructions](https://support.google.com/googleapi/answer/6158841)
-to enable the following APIs in your Google Cloud project:
+### 1. Enable Google Analytics APIs
 
-* [Google Analytics Admin API](https://console.cloud.google.com/apis/library/analyticsadmin.googleapis.com)
-* [Google Analytics Data API](https://console.cloud.google.com/apis/library/analyticsdata.googleapis.com)
+Enable the following APIs in your Google Cloud project:
 
-### Configure credentials 🔑
+- [Google Analytics Admin API](https://console.cloud.google.com/apis/library/analyticsadmin.googleapis.com)
+- [Google Analytics Data API](https://console.cloud.google.com/apis/library/analyticsdata.googleapis.com)
 
-Configure your [Application Default Credentials
-(ADC)](https://cloud.google.com/docs/authentication/provide-credentials-adc).
-Make sure the credentials are for a user with access to your Google Analytics
-accounts or properties.
+### 2. Create Service Account
 
-- **Service account JSON via `GOOGLE_APPLICATION_CREDENTIALS`**: ADC supports
-  pointing to a service account key file. Set `GOOGLE_APPLICATION_CREDENTIALS`
-  to the absolute path of your service account JSON and the server will use it
-  automatically.
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a service account with the Analytics API scope
+3. Download the JSON key file
 
-- **Delegated subject (domain-wide delegation)**: If your service account needs
-  to act on behalf of a user so that
-  Analytics properties are visible, set the environment variable
-  `ANALYTICS_MCP_SUBJECT` to that user’s email. The server will apply
-  domain‑wide delegation when using service account credentials. Ensure the
-  service account is configured for
-  [delegating domain‑wide authority](https://developers.google.com/identity/protocols/oauth2/service-account#delegatingauthority)
-  and has access to the relevant Analytics data. For backward compatibility,
-  the alias `GOOGLE_IMPERSONATED_SUBJECT` is also supported.
+### 3. Set Environment Variables
 
-Credentials must include the Google Analytics read-only scope:
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
+```
 
+#### Domain-Wide Delegation (Optional)
+
+If you need to access Analytics properties on behalf of a user:
+
+```bash
+export ANALYTICS_MCP_SUBJECT="user@yourdomain.com"
+```
+
+**Note:** For backward compatibility, `GOOGLE_IMPERSONATED_SUBJECT` is also supported.
+
+Required OAuth scope:
 ```
 https://www.googleapis.com/auth/analytics.readonly
 ```
 
-Check out
-[Manage OAuth Clients](https://support.google.com/cloud/answer/15549257)
-for how to create an OAuth client.
+## Usage with MCP Clients
 
-Here are some sample `gcloud` commands you might find useful:
+### Claude Desktop / Gemini
 
-- Set up ADC using user credentials and an OAuth desktop or web client after
-  downloading the client JSON to `YOUR_CLIENT_JSON_FILE`.
+Add to your MCP settings file (`~/.gemini/settings.json` or Claude Desktop config):
 
-  ```shell
-  gcloud auth application-default login \
-    --scopes https://www.googleapis.com/auth/analytics.readonly,https://www.googleapis.com/auth/cloud-platform \
-    --client-id-file=YOUR_CLIENT_JSON_FILE
-  ```
-
-- Set up ADC using service account impersonation.
-
-  ```shell
-  gcloud auth application-default login \
-    --impersonate-service-account=SERVICE_ACCOUNT_EMAIL \
-    --scopes=https://www.googleapis.com/auth/analytics.readonly,https://www.googleapis.com/auth/cloud-platform
-  ```
-
-When the `gcloud auth application-default` command completes, copy the
-`PATH_TO_CREDENTIALS_JSON` file location printed to the console in the
-following message. You'll need this for the next step!
-
-```
-Credentials saved to file: [PATH_TO_CREDENTIALS_JSON]
-```
-
-### Configure Gemini
-
-1.  Install [Gemini
-    CLI](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/index.md)
-    or [Gemini Code
-    Assist](https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist).
-
-1.  Create or edit the file at `~/.gemini/settings.json`, adding your server
-    to the `mcpServers` list.
-
-    ```json
-    {
-      "mcpServers": {
-        "analytics-mcp": {
-          "command": "pipx",
-          "args": [
-            "run",
-            "--spec",
-            "git+https://github.com/locomotive-agency/google-analytics-mcp.git",
-            "google-analytics-mcp"
-          ]
-        }
+```json
+{
+  "mcpServers": {
+    "google-analytics": {
+      "command": "uvx",
+      "args": ["google-analytics-mcp-python"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "/path/to/service-account-key.json",
+        "ANALYTICS_MCP_SUBJECT": "user@yourdomain.com"
       }
     }
-    ```
+  }
+}
+```
 
-1.  **Optional:** Configure environment variables in Gemini settings. You may
-    want to do this if you always want to use a specific set of credentials or
-    delegated subject, regardless of your local ADC.
+## Docker Deployment
 
-    In `~/.gemini/settings.json`, add these to the `env` object as needed.
-
-    ```json
-    {
-      "mcpServers": {
-        "analytics-mcp": {
-          "command": "pipx",
-          "args": [
-            "run",
-            "--spec",
-            "git+https://github.com/locomotive-agency/google-analytics-mcp.git",
-            "google-analytics-mcp"
-          ],
-          "env": {
-            "GOOGLE_APPLICATION_CREDENTIALS": "PATH_TO_CREDENTIALS_JSON",
-            "GOOGLE_PROJECT_ID": "YOUR_PROJECT_ID"
-            "ANALYTICS_MCP_SUBJECT": "client@locomotive.agency"
-          }
-        }
-      }
-    }
-    ```
-
-## Running on python:slim containers (no git)
-
-If your runtime is a slim Python container without `git`, you can install and
-run the server using either the GitHub source ZIP (no git required) or by
-including the source in your image.
-
-- **Install from GitHub ZIP (no git):**
-
-  ```bash
-  pip install --no-cache-dir https://github.com/locomotive-agency/google-analytics-mcp/archive/refs/heads/main.zip
-  ```
-
-- **Install from local source (COPY into image):**
-
-  ```bash
-  pip install --no-cache-dir .
-  ```
-
-- **Run command:**
-
-  ```bash
-  google-analytics-mcp
-  ```
-
-- **Required environment variables:**
-  - `GOOGLE_APPLICATION_CREDENTIALS`: Absolute path to your service account
-    JSON (mount or secret). Example: `/var/secrets/adc.json`.
-  - `ANALYTICS_MCP_SUBJECT` (optional): Delegated user email to impersonate,
-    e.g. `client@locomotive.agency`.
-
-Example Dockerfile snippet:
+Example Dockerfile for containerized deployment:
 
 ```dockerfile
 FROM python:3.12-slim
 
-# Install the server without git using the GitHub source ZIP
-RUN pip install --no-cache-dir \
-    https://github.com/locomotive-agency/google-analytics-mcp/archive/refs/heads/main.zip
+RUN pip install --no-cache-dir google-analytics-mcp-python
 
-# Provide credentials at runtime (recommended: mount a secret)
-ENV GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/adc.json
-# Optional: impersonate a delegated subject
-# ENV ANALYTICS_MCP_SUBJECT=client@locomotive.agency
+ENV GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/service-account.json
 
 CMD ["google-analytics-mcp"]
 ```
 
-## Try it out :lab_coat:
+Required environment variables:
+- `GOOGLE_APPLICATION_CREDENTIALS` - Path to service account JSON
+- `ANALYTICS_MCP_SUBJECT` (optional) - User email for domain-wide delegation
 
-Launch Gemini Code Assist or Gemini CLI and type `/mcp`. You should see
-`analytics-mcp` listed in the results.
+## Example Prompts
 
-Here are some sample prompts to get you started:
+Once configured, you can interact with your Google Analytics data:
 
-- Ask what the server can do:
+```
+What are the most popular events in my Google Analytics property in the last 180 days?
+```
 
-  ```
-  what can the analytics-mcp server do?
-  ```
+```
+Give me details about my Google Analytics property with 'xyz' in the name
+```
 
-- Ask about a Google Analytics property
+```
+What are the custom dimensions and custom metrics in my property?
+```
 
-  ```
-  Give me details about my Google Analytics property with 'xyz' in the name
-  ```
+```
+Were most of my users in the last 6 months logged in?
+```
 
-- Prompt for analysis:
+## Development
 
-  ```
-  what are the most popular events in my Google Analytics property in the last 180 days?
-  ```
+This server is maintained by [Locomotive Agency](https://locomotive.agency) as part of the MCP Anywhere ecosystem.
 
-- Ask about signed-in users:
+Original implementation by Google Analytics team. Enhanced with domain-wide delegation support for enterprise use cases.
 
-  ```
-  were most of my users in the last 6 months logged in?
-  ```
+## License
 
-- Ask about property configuration:
+Apache License 2.0 - See LICENSE file for details.
 
-  ```
-  what are the custom dimensions and custom metrics in my property?
-  ```
-
-## Contributing ✨
+## Contributing
 
 Contributions welcome! See the [Contributing Guide](CONTRIBUTING.md).

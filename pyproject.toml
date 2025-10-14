@@ -1,12 +1,28 @@
 [project]
-name = "analytics-mcp"
-description = "MCP server for Google Analytics"
-version = "0.1.1"
-# Lower bound of 3.10 due to the 'mcp' dependency:
-# https://github.com/modelcontextprotocol/python-sdk/blob/main/pyproject.toml
-requires-python = ">=3.10"
+name = "google-analytics-mcp-python"
+version = "0.1.2"
+description = "MCP Server for Google Analytics API access"
+authors = [
+    { name = "Locomotive Agency", email = "cloud@locomotive.agency" },
+    { name = "Josh Radcliff", email = "jradcliff@users.noreply.github.com" },
+    { name = "Matt Landers", email = "matt-landers@users.noreply.github.com" }
+]
 license = "Apache-2.0"
 readme = "README.md"
+keywords = ["mcp", "google-analytics", "ai", "tools", "ga4", "analytics"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+]
+requires-python = ">= 3.10"
 dependencies = [
     "google-analytics-data==0.18.19",
     "google-analytics-admin==0.25.0",
@@ -14,35 +30,11 @@ dependencies = [
     "mcp[cli]>=1.2.0",
     "httpx>=0.28.1"
 ]
-keywords = [
-    "google analytics",
-    "analytics",
-    "mcp",
-    "ga4"
-]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Intended Audience :: End Users/Desktop",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Operating System :: OS Independent",
-    "Topic :: Internet",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Scientific/Engineering :: Information Analysis"
-]
-authors = [
-    { name = "Josh Radcliff", email = "jradcliff@users.noreply.github.com" },
-    { name = "Matt Landers", email = "matt-landers@users.noreply.github.com" }
-]
 
 [project.urls]
-homepage = "https://github.com/googleanalytics/google-analytics-mcp"
-repository = "https://github.com/googleanalytics/google-analytics-mcp.git"
-issues = "https://github.com/googleanalytics/google-analytics-mcp/issues"
+homepage = "https://github.com/locomotive-agency/google-analytics-mcp"
+repository = "https://github.com/locomotive-agency/google-analytics-mcp"
+issues = "https://github.com/locomotive-agency/google-analytics-mcp/issues"
 
 [project.scripts]
 analytics-mcp = "analytics_mcp.server:run_server"
